@@ -1,6 +1,6 @@
 import { MagazineIssue, MagazineSection, CSVData, Highlight } from '@/lib/types'
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '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'
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1'
 
 const FAST_MODELS = [

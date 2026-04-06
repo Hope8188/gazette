@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const magazine = await generateMagazineContent(datasets)
     const pdf = await generatePDF(magazine)
 
-    return new NextResponse(pdf, {
+    return new NextResponse(new Uint8Array(pdf), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${magazine.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf"`,

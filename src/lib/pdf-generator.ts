@@ -370,18 +370,43 @@ function generateMagazineHTML(issue: MagazineIssue): string {
 }
 
 export async function generatePDF(issue: MagazineIssue): Promise<Buffer> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-  })
+  let browser;
   
   try {
-    const page = await browser.newPage()
-    const html = generateMagazineHTML(issue)
+    // Detect if we're in a serverless environment (Netlify/AWS Lambda)
+    const isServerless = !!process.env.NETLIFY || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+    console.log(`Environment detected: ${isServerless ? 'Serverless' : 'Local'}`);
+
+    if (isServerless) {
+      // Netlify-specific browser launch
+      const chromium = await import('@sparticuz/chromium-min') as any;
+      const puppeteerCore = await import('puppeteer-core') as any;
+      
+      const chrom = chromium.default || chromium;
+      const puppeteer = puppeteerCore.default || puppeteerCore;
+      
+      browser = await puppeteer.launch({
+        args: chrom.args,
+        defaultViewport: chrom.defaultViewport,
+        executablePath: await chrom.executablePath(),
+        headless: chrom.headless,
+      });
+    } else {
+      // Standard local browser launch
+      const puppeteerLocal = await import('puppeteer') as any;
+      const puppeteer = puppeteerLocal.default || puppeteerLocal;
+      
+      browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      });
+    }
+
+    const page = await browser.newPage();
+    const html = generateMagazineHTML(issue);
     
-    await page.setContent(html, { waitUntil: 'networkidle0' })
-    
-    await page.evaluateHandle('document.fonts.ready')
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    await page.evaluate(() => document.fonts.ready);
     
     const pdf = await page.pdf({
       format: 'A4',
@@ -395,11 +420,16 @@ export async function generatePDF(issue: MagazineIssue): Promise<Buffer> {
         </div>
       `,
       margin: { top: '0', right: '0', bottom: '60px', left: '0' }
-    })
+    });
     
-    return Buffer.from(pdf)
+    return Buffer.from(pdf);
+  } catch (error) {
+    console.error('CRITICAL ERROR IN generatePDF:', error);
+    throw error;
   } finally {
-    await browser.close()
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 

@@ -13,6 +13,7 @@ interface BentoCardProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
   gradient?: boolean
   delay?: number
+  accent?: 'blue' | 'emerald' | 'purple' | 'amber'
 }
 
 export function BentoCard({ 
@@ -23,13 +24,21 @@ export function BentoCard({
   icon,
   size = 'md',
   gradient = false,
-  delay = 0
+  delay = 0,
+  accent = 'blue'
 }: BentoCardProps) {
   const sizeClasses = {
     sm: 'col-span-1 row-span-1',
     md: 'col-span-1 md:col-span-2 row-span-1',
     lg: 'col-span-1 md:col-span-2 lg:col-span-3 row-span-2',
     xl: 'col-span-1 md:col-span-2 lg:col-span-4 row-span-2'
+  }
+
+  const accentStyles = {
+    blue: 'from-blue-600 to-blue-700',
+    emerald: 'from-emerald-600 to-emerald-700',
+    purple: 'from-purple-600 to-purple-700',
+    amber: 'from-amber-600 to-amber-700'
   }
 
   return (
@@ -39,10 +48,10 @@ export function BentoCard({
       transition={{ duration: 0.5, delay: delay * 0.1 }}
       className={cn(
         "relative overflow-hidden rounded-2xl border transition-all duration-300",
-        "hover:shadow-lg hover:scale-[1.01] cursor-default",
+        "hover:shadow-2xl hover:shadow-blue-500/10 hover:scale-[1.01] cursor-default",
         gradient 
-          ? "bg-gradient-to-br from-blue-600 to-indigo-700 border-transparent text-white"
-          : "bg-white border-slate-200 hover:border-slate-300",
+          ? `bg-gradient-to-br ${accentStyles[accent]} border-transparent text-white glow-blue`
+          : "bg-slate-900/60 border-slate-700/50 hover:border-slate-600/50 backdrop-blur-sm",
         sizeClasses[size],
         className
       )}
@@ -53,8 +62,8 @@ export function BentoCard({
             <div>
               {title && (
                 <h3 className={cn(
-                  "text-lg font-semibold",
-                  gradient ? "text-white" : "text-slate-900"
+                  "text-lg font-semibold font-display",
+                  gradient ? "text-white" : "text-slate-100"
                 )}>
                   {title}
                 </h3>
@@ -62,7 +71,7 @@ export function BentoCard({
               {subtitle && (
                 <p className={cn(
                   "text-sm mt-1",
-                  gradient ? "text-white/80" : "text-slate-500"
+                  gradient ? "text-white/80" : "text-slate-400"
                 )}>
                   {subtitle}
                 </p>
@@ -70,8 +79,8 @@ export function BentoCard({
             </div>
             {icon && (
               <div className={cn(
-                "p-2 rounded-xl",
-                gradient ? "bg-white/20" : "bg-slate-100"
+                "p-2.5 rounded-xl transition-colors",
+                gradient ? "bg-white/20" : "bg-slate-800/80"
               )}>
                 {icon}
               </div>

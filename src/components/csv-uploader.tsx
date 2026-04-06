@@ -152,8 +152,8 @@ export function CSVUploader({ onFilesProcessed, maxFiles = 10 }: CSVUploaderProp
         className={cn(
           "relative border-2 border-dashed rounded-2xl p-8 transition-all duration-200 cursor-pointer",
           isDragging 
-            ? "border-blue-500 bg-blue-50" 
-            : "border-slate-300 hover:border-slate-400 bg-slate-50/50"
+            ? "border-blue-400 bg-blue-500/10" 
+            : "border-slate-600 hover:border-slate-500 bg-slate-800/50"
         )}
       >
         <input
@@ -166,22 +166,22 @@ export function CSVUploader({ onFilesProcessed, maxFiles = 10 }: CSVUploaderProp
         <div className="flex flex-col items-center justify-center text-center space-y-3">
           <div className={cn(
             "w-16 h-16 rounded-2xl flex items-center justify-center transition-colors",
-            isDragging ? "bg-blue-100" : "bg-white shadow-sm"
+            isDragging ? "bg-blue-500/20" : "bg-slate-800 shadow-sm"
           )}>
             <Upload className={cn(
               "w-8 h-8 transition-colors",
-              isDragging ? "text-blue-600" : "text-slate-400"
+              isDragging ? "text-blue-400" : "text-slate-400"
             )} />
           </div>
           <div>
-            <p className="text-lg font-semibold text-slate-900">
+            <p className="text-lg font-semibold text-slate-100">
               {processing ? 'Processing...' : 'Drop CSV files here'}
             </p>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-slate-400 mt-1">
               or click to browse (max {maxFiles} files)
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
             <FileSpreadsheet className="w-4 h-4" />
             <span>Supports multiple CSV files</span>
           </div>
@@ -193,22 +193,22 @@ export function CSVUploader({ onFilesProcessed, maxFiles = 10 }: CSVUploaderProp
           {files.map((file, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 shadow-sm"
+              className="flex items-center justify-between p-3 bg-slate-800/80 rounded-xl border border-slate-700/50"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
-                  <Check className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <Check className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900">{file.name}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-sm font-medium text-slate-100">{file.name}</p>
+                  <p className="text-xs text-slate-400">
                     {(file.size / 1024).toFixed(1)} KB
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => removeFile(index)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
               >
                 <X className="w-4 h-4 text-slate-400" />
               </button>

@@ -15,9 +15,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    console.log('Generating magazine content with datasets:', datasets.length)
     const magazine = await generateMagazineContent(datasets)
+    console.log('Magazine content generated:', magazine.title)
+    
+    console.log('Generating PDF...')
     const pdf = await generatePDF(magazine)
-
+    console.log('PDF generation complete. Size:', pdf.length)
+ 
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
         'Content-Type': 'application/pdf',
@@ -25,9 +30,9 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch (error) {
-    console.error('PDF Generation Error:', error)
+    console.error('CRITICAL ERROR IN ROUTE:', error)
     return NextResponse.json(
-      { error: 'Failed to generate PDF' },
+      { error: 'Failed to generate PDF', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

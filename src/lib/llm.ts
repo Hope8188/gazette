@@ -4,11 +4,10 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1'
 
 const FAST_MODELS = [
-  'google/gemini-2.5-pro-exp-03-25:free',
-  'google/gemini-2.0-flash-thinking-exp:free',
-  'google/gemini-2.0-flash-exp:free',
-  'qwen/qwen2.5-vl-72b-instruct:free',
-  'meta-llama/llama-3.2-11b-vision-instruct:free'
+  'google/gemini-3-flash-preview',
+  'google/gemini-3.1-pro-preview',
+  'google/gemini-2.5-flash',
+  'google/gemini-2.5-flash-lite'
 ]
 
 interface LLMResponse {
@@ -33,14 +32,14 @@ interface LLMResponse {
 
 export async function generateMagazineContent(datasets: CSVData[]): Promise<MagazineIssue> {
   const dataContext = datasets.map(dataset => ({
-    name: dataset.name,
-    rows: dataset.summary.totalRows,
-    headers: dataset.headers,
-    numericColumns: dataset.summary.numericColumns,
-    categoricalColumns: dataset.summary.categoricalColumns,
-    statistics: dataset.summary.statistics,
-    topValues: dataset.summary.topValues,
-    sampleData: dataset.data.slice(0, 10)
+    name: dataset.name || 'Unnamed Dataset',
+    rows: dataset.summary?.totalRows ?? 0,
+    headers: dataset.headers || [],
+    numericColumns: dataset.summary?.numericColumns || [],
+    categoricalColumns: dataset.summary?.categoricalColumns || [],
+    statistics: dataset.summary?.statistics || {},
+    topValues: dataset.summary?.topValues || {},
+    sampleData: (dataset.data || []).slice(0, 10)
   }))
 
   const prompt = `You are a professional data journalist and magazine editor. Create a compelling magazine-style report from this data.
@@ -117,7 +116,9 @@ Return only valid JSON. No markdown, no code blocks, just raw JSON.`
     clearTimeout(timeout)
 
     if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status}`)
+      const errorData = await response.json().catch(() => ({}))
+      console.error('OpenRouter Error Body:', JSON.stringify(errorData, null, 2))
+      throw new Error(`OpenRouter API error: ${response.status} ${errorData.error?.message || ''}`)
     }
 
     const result = await response.json()
